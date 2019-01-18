@@ -18,4 +18,5 @@ display(census)
 
 # COMMAND ----------
 
-dbutils.fs.unmount("/mnt/datalake")
+#Race condition between display and mounting in interactive environment.
+#dbutils.fs.unmount("/mnt/datalake")
