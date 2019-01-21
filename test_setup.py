@@ -7,7 +7,7 @@ configs = {"fs.azure.account.auth.type": "OAuth",
 
 # Optionally, you can add <your-directory-name> to the source URI of your mount point.
 dbutils.fs.mount(
-  source = "abfss://datalake@dacrookdbdevstorage.dfs.core.windows.net", #blobcontainername@storageaccount
+  source = dbutils.secrets.get(scope = "data-lake", key = "datalake-fqdn"),
   mount_point = "/mnt/datalake",
   extra_configs = configs)
 
