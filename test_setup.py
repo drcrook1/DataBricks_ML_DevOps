@@ -1,4 +1,3 @@
-# FUTURE SERVICE PRINCIPAL STUFF FOR MOUNTING
 secrets = {}
 secrets["blob_name"] = dbutils.secrets.get(scope = "data-lake", key = "blob-name")
 secrets["blob_key"] = dbutils.secrets.get(scope = "data-lake", key = "blob-key") 
@@ -7,22 +6,29 @@ secrets["subscription_id"] = dbutils.secrets.get(scope = "data-lake", key = "sub
 secrets["resource_group"] = dbutils.secrets.get(scope = "data-lake", key = "resource-group")
 secrets["ml_workspace_name"] = dbutils.secrets.get(scope = "data-lake", key = "ml-workspace-name")
 secrets["alg_state"] = dbutils.secrets.get(scope = "data-lake", key = "alg-state")
+secrets["sp_app_id"] = dbutils.secrets.get(scope = "data-lake", key = "sp-app-id")
+secrets["sp_password"] = dbutils.secrets.get(scope = "data-lake", key = "sp-password")
+secrets["sp_tenant_id"] = dbutils.secrets.get(scope = "data-lake", key = "sp-tenant-id")
+secrets["sp_token_endpoint"] = dbutils.secrets.get(scope = "data-lake", key = "sp-token-endpoint")
 try:
   secrets["created_by"] = dbutils.secrets.get(scope = "data-lake", key = "created-by")
 except Exception as e:
   print("falling back to user set created_by")
   secrets["created_by"] = "dacrook"
-           
-#create the config variable to pass into mount
-configs = {"fs.azure.account.key." + secrets["blob_name"] + ".blob.core.windows.net":"" + secrets["blob_key"] + ""}
 
-#mounting the external blob storage as mount point datalake for data storage.
-dbutils.fs.mount( source = "wasbs://" + secrets["container_name"] + "@" + secrets["blob_name"] + ".blob.core.windows.net/", 
-                 mount_point = "/mnt/datalake/", 
-                 extra_configs = configs)           
+configs = {"fs.azure.account.auth.type": "OAuth",
+           "fs.azure.account.oauth.provider.type": "org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider",
+           "fs.azure.account.oauth2.client.id": secrets["sp_app_id"], #Service Principal App ID
+           "fs.azure.account.oauth2.client.secret": secrets["sp_password"], #Service Principal Key
+           "fs.azure.account.oauth2.client.endpoint": secrets["sp_token_endpoint"]} #directory id
 
-#display the files in the folder
-dbutils.fs.ls("dbfs:/mnt/datalake")
+try:
+  #mounting the external blob storage as mount point datalake for data storage.
+  dbutils.fs.mount( source = "wasbs://" + secrets["container_name"] + "@" + secrets["blob_name"] + ".blob.core.windows.net/", 
+                   mount_point = "/mnt/datalake/", 
+                   extra_configs = configs)
+except Exception as e:
+  print("already mounted; no need to do so.")
 
 census = sqlContext.read.format('csv').options(header='true', inferSchema='true').load('/mnt/datalake/AdultCensusIncome.csv')
 census.printSchema()
