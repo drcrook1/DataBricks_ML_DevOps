@@ -1,6 +1,5 @@
 secrets = {}
-secrets["blob_name"] = dbutils.secrets.get(scope = "data-lake", key = "blob-name")
-secrets["blob_key"] = dbutils.secrets.get(scope = "data-lake", key = "blob-key") 
+secrets["storage_account_name"] = dbutils.secrets.get(scope = "data-lake", key = "storage-account-name")
 secrets["container_name"] = dbutils.secrets.get(scope = "data-lake", key = "container-name")
 secrets["subscription_id"] = dbutils.secrets.get(scope = "data-lake", key = "subscription-id")
 secrets["resource_group"] = dbutils.secrets.get(scope = "data-lake", key = "resource-group")
@@ -23,10 +22,10 @@ configs = {"fs.azure.account.auth.type": "OAuth",
            "fs.azure.account.oauth2.client.endpoint": secrets["sp_token_endpoint"]} #directory id
 
 try:
-  #mounting the external blob storage as mount point datalake for data storage.
-  dbutils.fs.mount( source = "wasbs://" + secrets["container_name"] + "@" + secrets["blob_name"] + ".blob.core.windows.net/", 
-                   mount_point = "/mnt/datalake/", 
-                   extra_configs = configs)
+  dbutils.fs.mount(
+    source = "abfss://" + secrets["container_name"] + "@" + secrets["storage_account_name"] + ".dfs.core.windows.net", #blobcontainername@storageaccount
+    mount_point = "/mnt/datalake",
+    extra_configs = configs)
 except Exception as e:
   print("already mounted; no need to do so.")
 
