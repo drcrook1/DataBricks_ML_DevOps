@@ -102,3 +102,9 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# AZ ML TOOLING GENERATED FILES
+/Project_One/dockerfile
+/Project_One/my_runbuild_local.cmd
+/Project_One/notebooks/myenv.yml
+/Project_One-Tests/dockerfile

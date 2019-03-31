@@ -1,0 +1,18 @@
+FROM <AZMLGENERATEDCONTAINER>
+
+RUN pip install pytest
+RUN pip install pytest-cov
+
+COPY . /var/azureml-app/tests
+RUN mkdir /var/azureml-app/tests/junit
+
+COPY ./__init__.py /var/azureml-app
+
+RUN chmod +x /var/azureml-app/tests/runtests.sh
+
+WORKDIR "/var/azureml-app"
+
+#Ensures python print lines are printed out
+ENV PYTHONUNBUFFERED 1
+
+CMD ["bash", "/var/azureml-app/tests/runtests.sh"]

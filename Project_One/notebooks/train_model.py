@@ -1,5 +1,8 @@
+# Databricks notebook source
+# FUTURE SERVICE PRINCIPAL STUFF FOR MOUNTING
 secrets = {}
-secrets["storage_account_name"] = dbutils.secrets.get(scope = "data-lake", key = "storage-account-name")
+secrets["blob_name"] = dbutils.secrets.get(scope = "data-lake", key = "blob-name")
+secrets["blob_key"] = dbutils.secrets.get(scope = "data-lake", key = "blob-key") 
 secrets["container_name"] = dbutils.secrets.get(scope = "data-lake", key = "container-name")
 secrets["subscription_id"] = dbutils.secrets.get(scope = "data-lake", key = "subscription-id")
 secrets["resource_group"] = dbutils.secrets.get(scope = "data-lake", key = "resource-group")
@@ -15,6 +18,27 @@ except Exception as e:
   print("falling back to user set created_by")
   secrets["created_by"] = "dacrook"
 
+# COMMAND ----------
+
+#
+# THIS IS FOR BLOB MOUNTING
+#
+#create the config variable to pass into mount
+#configs = {"fs.azure.account.key." + secrets["blob_name"] + ".blob.core.windows.net":"" + secrets["blob_key"] + ""}
+
+#try:
+  #mounting the external blob storage as mount point datalake for data storage.
+#  dbutils.fs.mount( source = "wasbs://" + secrets["container_name"] + "@" + secrets["blob_name"] + ".blob.core.windows.net/", 
+#                   mount_point = "/mnt/datalake/", 
+ #                  extra_configs = configs)
+#except Exception as e:
+#  print("already mounted; no need to do so.")
+
+# COMMAND ----------
+
+#
+# THIS IS FOR ADLS V2 Mounting
+#
 configs = {"fs.azure.account.auth.type": "OAuth",
            "fs.azure.account.oauth.provider.type": "org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider",
            "fs.azure.account.oauth2.client.id": secrets["sp_app_id"], #Service Principal App ID
@@ -22,6 +46,7 @@ configs = {"fs.azure.account.auth.type": "OAuth",
            "fs.azure.account.oauth2.client.endpoint": secrets["sp_token_endpoint"]} #directory id
 
 try:
+  #mounting the external blob storage as mount point datalake for data storage.
   dbutils.fs.mount(
     source = "abfss://" + secrets["container_name"] + "@" + secrets["storage_account_name"] + ".dfs.core.windows.net", #blobcontainername@storageaccount
     mount_point = "/mnt/datalake",
@@ -29,9 +54,18 @@ try:
 except Exception as e:
   print("already mounted; no need to do so.")
 
+# COMMAND ----------
+
+#display the files in the folder
+dbutils.fs.ls("dbfs:/mnt/datalake")
+
+# COMMAND ----------
+
 census = sqlContext.read.format('csv').options(header='true', inferSchema='true').load('/mnt/datalake/AdultCensusIncome.csv')
 census.printSchema()
 display(census.select("age", " fnlwgt", " hours-per-week"))
+
+# COMMAND ----------
 
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -40,8 +74,17 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error, r2_score
 import pickle
 
+# COMMAND ----------
+
 x = np.array(census.select("age", " hours-per-week").collect()).reshape(-1,2)
 y = np.array(census.select(" fnlwgt").collect()).reshape(-1,1)
+
+# COMMAND ----------
+
+x
+y
+
+# COMMAND ----------
 
 #Split data & Train Scalers
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.33, random_state = 777, shuffle = True)
@@ -64,6 +107,8 @@ r2 = r2_score(y_test, y_predicted)
 print(mae)
 print(r2)
 
+# COMMAND ----------
+
 #Write Files to local file storage
 import os
 #Also works: "/dbfs/tmp/models/worst_regression/dacrook/"
@@ -81,10 +126,15 @@ with open(prefix + "model.pkl", "wb") as handle:
 from azureml.core.workspace import Workspace
 from azureml.core.authentication import ServicePrincipalAuthentication
 from azureml.core.model import Model
-print("Logging In - navigate to https://microsoft.com/devicelogin and enter the code from the print out below")
-az_ws = Workspace(secrets["subscription_id"], secrets["resource_group"], secrets["ml_workspace_name"])
+az_sp = ServicePrincipalAuthentication(secrets["sp_tenant_id"], secrets["sp_app_id"], secrets["sp_password"]) #tenant id
+az_ws = Workspace(secrets["subscription_id"], secrets["resource_group"], secrets["ml_workspace_name"], auth= az_sp)
 print("Logged in and workspace retreived.")
 Model.register(az_ws, model_path = prefix, model_name = "worst_regression", tags={"state" : secrets["alg_state"], "created_by" : secrets["created_by"]})
 
+# COMMAND ----------
+
 #finally unmount the mount.
-dbutils.fs.unmount("/mnt/datalake")
+try:
+  dbutils.fs.unmount("/mnt/datalake")
+except Exception as e:
+  print("already unmounted; no need to unmount again.")

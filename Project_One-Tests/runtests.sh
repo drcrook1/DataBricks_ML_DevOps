@@ -1,0 +1,2 @@
+#!/bin/bash
+pytest --doctest-modules --junitxml=/var/azureml-app/tests/junit/test-results.xml --cov=/var/azureml-app/inference_code/ /var/azureml-app/tests --cov-report=xml:/var/azureml-app/tests/junit/coverage.xml --cov-report=html:/var/azureml-app/tests/junit/cov_html
