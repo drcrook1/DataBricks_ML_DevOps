@@ -10,12 +10,12 @@ Begin by creating 3 resource groups.
 •	[some-name]-db-dev
 •	[some-name]-db-pipeline
 •	[some-name]-db-prod
- 
+![alt text](./readme_images/add_resource_groups.png)
 ### Adding Resources to Resource Groups
 These steps should be completed for resource groups [some-name]-db-dev and [some-name]-db-pipeline.  [some-name]-db-prod will have different resources completely.
 #### Add Machine Learning Service Workspace
 1.	Select “Add a Resource”.
-a.	 
+	 ![alt text](./readme_images/add_resource.png)
 2.	Search for “machine learning” and select “Machine Learning service workspace” published by Microsoft.  Click Create
 a.	 
 3.	Populate the fields with a naming convention that makes sense to you.  Select the correct resource group and ensure the location pairs with your other services.
