@@ -202,7 +202,11 @@ The dev loop experience encompasses mounting the dev data, exploring that data, 
     2.  You train a super simple algorithm and register the resulting model files with the AZML service such that we can bridge the divide between databricks and inference coding.  This process is ML Framework independent and can be used cross algorithms, frameworks etc.
 ## Inference Coding
 This section extends from having a trained model to now building an inference container which is reflective of the asset we will deliver to our customer base.
+
 Code Structure
+
+![alt text](./readme_images/inference_code_structure.png)
+
 Good Code Structure from the beginning is a great way to ensure you are set up well.  In this case we are going to follow well defined development strategies via a bit of a hybrid between .net project structures and python project structures.
  
 We have two folders for each project.  Project_One is the primary inference project
@@ -213,7 +217,11 @@ We have two folders for each project.  Project_One is the primary inference proj
 a.	“git checkout <YOURBRANCHNAME>”
 b.	“git pull”
 ### Test Driven Development
+
+#### Write a Test
 You should always start with testing and then writing code to satisfy those tests.  The only code which will be required to write is the test_model.py.  The facilitation code here is provided for you.
+
+![alt text](./readme_images/test_model_view.png)
  
 Inside this file we will write a very simple unit test to ensure that the x_scaler object is populated during model initialization.
 
@@ -223,6 +231,18 @@ Inside this file we will write a very simple unit test to ensure that the x_scal
     1.  Project_One is the project code which seperates the inference code as a "provider" type class following similiar principals from the testable web dev space.  
     2.  Project_One-Tests is your seperated testing code such that it is not coupled with your app development code.
     3.  A container is built for the inference code, which is then extended with the test code.  The base inference container is the asset expected to be deployed while the extended testing container allows you to test the assets in the same type of format as if they were to be compiled.
+
+#### Review Inference Code
+Normally we would test and ensure the tests fail before writing the inference code; however much of the code is already written, so we will simply review it.
+
+![alt text](./readme_images/inference_code_review.png)
+
+In an ideal world, the only code you would need to worry about is highlighted in red.  The current state of tooling as of today is why the other code exists and is not wrapped up as ADO Tasks or VS Code extensions.  
+
+The proctor will run through the code with your, but essentially:
+1.  ./Project_One/score.py is what the azure ml sdk expects as the interface and must be populated with an init() and a run(params).  The params are what is received in the http request body (or iot edge message over the route)
+2.  The code placed in inference_code is to help ensure code coverage is reported appropriately.  We follow a similar provider type structure as in web dev when there is a pre-defined functional interface.  The objective is to minimize that footprint to 1 line of code. (in score.py init and run)
+3.  The rest of the code is a dockerized build process that can run independent of the dependencies installed on your system such that the build on your machine is the same as the build in the build server improving confidence the locally generated and tested asset will match the asset which has probability of being promoted to production.
 
 We now have inference code with matching train code.  Lets build the inference container and test it.
 ### Build Inference Container
@@ -236,16 +256,16 @@ From the command prompt:
 1.	Change directory into the Project_One folder.
 2.	Run the runbuild_local.cmd
 a.	You may need to execute az login prior to executing this command or be interactively logged in (watch the output)
-b.	 
+![alt text](./readme_images/run_build_local.png)
 c.	This will execute a bunch of stuff and be on “Creating image” for a while.  Occasionally hit enter to see if the cmd prompt output is up to date or not.
-d.	 
+![alt text](./readme_images/successful_local_build.png)
 ### Test Inference Container
 1.	Change directory into the Project_One-Tests folder.
 2.	Run the runtests_local.cmd file
 3.	This will extend the container you created in the previous step, run your unit tests and check your code coverage.  The code coverage results can be found in C:/ml_temp/artifacts/test_results  These are standard pytest and pytest-cov result outputs.
-4.	 
+![alt text](./readme_images/test_results.png)
 5.	Click on index.html from cov_html folder
-6.	 
+![alt text](./readme_images/local_test_results_web.png)
 7.	We have 68% code coverage; could be worse.
 ## Commit & Pull Request.
 1.	We now know that we have an inference container and it passes our unit tests and our code coverage is to a point where we are happy about it.
@@ -255,9 +275,9 @@ a.	Git add ./
 b.	Git commit -m “works”
 c.	Git push
 4.	Create a pull request by going to your ADO site, under repos, pull request, New Pull Request
- 
+![alt text](./readme_images/create_pull_request.png)
 5.	Populate the request template and ensure you have a reviewer:
- 
+![alt text](./readme_images/PR_options_form.png)
 6.	Review the changes with the reviewer you selected.  Ensure both enter ADO and hit “Approve” and then “Complete”.  If you see problems in your peers code; add comments and reject it.  Once both reviewers Approve you can complete.  This will launch the build pipelines & release pipelines which are connected to master.
  
 # Defining your Build Pipeline
