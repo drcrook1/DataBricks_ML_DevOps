@@ -166,33 +166,33 @@ This section covers creating a project in Azure Dev Ops for the workshop.
 1.	Navigate to https://dev.azure.com 
 2.	Select the organization you intend to use OR create a new organization.
 3.	Create a new project.  Pick a name, description.  Select “Git” for version control and “Agile” for the work item process.
-a.	 
+![alt text](./readme_images/create_ado_project.png)
 4.	Invite Additional Users
-a.	 
-b.	 
+![alt text](./readme_images/add_ado_user_1.png)
+![alt text](./readme_images/add_ado_user_2.png)
 5.	Click on Repos, Files.
 6.	At the very bottom, select “Initialize Repo”.
 ##### Scientists – Initial Setup
 Configure Azure Dev Ops Integrations
  Azure Databricks, set your Git provider to Azure DevOps Services on the User Settings page:
 1.	Click the User icon   at the top right of your screen and select User Settings.
- 
+![alt text](./readme_images/adb_user_settings.png)
 2.	Click the Git Integration tab.
 3.	Change your provider to Azure DevOps Services.
- 
+![alt text](./readme_images/ado_git_provider_adb.png)
 ##### Create & Link Project File w/ Repo
 1.	From inside the Data Bricks cluster interface, select workspace, shared, then the drop down, then create and create a “Folder”
-a.	 
+![alt text](./readme_images/adb_create_folder.png)
 2.	Name the folder “Project_One”
 3.	Create a new file inside the project called “train_model”.
-a.	 
+![alt text](./readme_images/adb_create_notebook.png)
 4.	Link “train_model.py” file to your Azure Dev Ops repository.
 a.	Copy the git link from your azure dev ops portal:
-i.	 
+![alt text](./readme_images/copy_ado_git_link.png)
 b.	Paste into the “link” location in the popup for “Git Preferences”
 c.	Create a new branch.  Name it your unique user ID
 d.	Use “Project_One/notebooks/train_model.py” as the path in git repo.
- 
+![alt text](./readme_images/adb_git_link_settings_form.png)
 # Dev Loop Experience
 The dev loop experience encompasses mounting the dev data, exploring that data, training a model; writing the inference code, compiling a dev container; running tests inside the dev container.
 ## Train the world’s worst regression & Stage for inference coding.
