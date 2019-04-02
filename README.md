@@ -15,20 +15,20 @@ Begin by creating 3 resource groups.
 These steps should be completed for resource groups [some-name]-db-dev and [some-name]-db-pipeline.  [some-name]-db-prod will have different resources completely.
 #### Add Machine Learning Service Workspace
 1.	Select “Add a Resource”.
-	 ![alt text](./readme_images/add_resource.png)
+![alt text](./readme_images/add_resource.png)
 2.	Search for “machine learning” and select “Machine Learning service workspace” published by Microsoft.  Click Create
-a.	 
+![alt text](./readme_images/add_ml_workspace.png)
 3.	Populate the fields with a naming convention that makes sense to you.  Select the correct resource group and ensure the location pairs with your other services.
-a.	 
+![alt text](./readme_images/populate_ml_workspace_resource_creation_settings.png)
 #### Add Data Lake (Azure Storage gen 2)
 1.	Select “Add a Resource” form within a resource group pane.
-a.	 
+![alt text](./readme_images/add_resource.png)
 2.	Search for “Storage” and select “Storage account” and click “create”
-a.	 
+![alt text](./readme_images/select_storage_account.png)
 3.	Fill out the creation form.  Ensure you are in the correct resource group.  Give the account a name, ensure it is StorageV2 and set access tier to Cool.
-a.	 
+![alt text](./readme_images/adls_gen2_basic_settings.png)
 4.	Click on “Advanced” and ensure “Hierarchical namespace” under “Data Lake Storage Gen2” is selected as “enabled”.
-a.	 
+![alt text](./readme_images/adls_gen2_advanced_settings.png)
 5.	Select Create
 #### Add Azure Key Vault
 1.	Select “Add a Resource” from within a resource group pane.
@@ -202,7 +202,7 @@ d.	Use “Project_One/notebooks/train_model.py” as the path in git repo.
 The dev loop experience encompasses mounting the dev data, exploring that data, training a model; writing the inference code, compiling a dev container; running tests inside the dev container.
 ## Train the world’s worst regression & Stage for inference coding.
 1.	Copy the code from Project_One/notebooks/train_model.py into your databricks train_model.py which was created earlier.
-2.  The proctor will step through what exactly the code is doing and why.
+1.  The proctor will step through what exactly the code is doing and why.
     1.  Essentially: The precreated secrets are being used to mount to various stores securely and will allow zero code changes as the algorithm progresses across secure environments.  
     2.  You train a super simple algorithm and register the resulting model files with the AZML service such that we can bridge the divide between databricks and inference coding.  This process is ML Framework independent and can be used cross algorithms, frameworks etc.
 ## Inference Coding
