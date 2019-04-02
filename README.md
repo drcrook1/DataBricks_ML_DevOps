@@ -428,35 +428,45 @@ The intention of this step is to create an Azure DevOps Pipeline that will mimic
 ![alt text](./readme_images/ado_build_pipe_select_empty_job.png)
 
 4.	Name your Pipeline accordingly and select the Hosted Ubuntu 1604 Build Agent from the Agent Pool.
- 
+
+![alt text](./readme_images/ado_build_pipe_set_build_agent_type.png)
+
 5.	Link the variable group that you created earlier by clicking on Variables in the menu bar, followed by Variable groups and click Link Variable Groups.
+
+![alt text](./readme_images/ado_build_pipe_link_variable_group.png)
  
 6.	Select the Staging Environment Variable Group and Click Link. Your pipeline now has access to all the runtime environmental variables to connect to the Staging Environment.
 
- 
+![alt text](./readme_images/ado_build_pipe_var_group_staging.png)
+
 7.	Click back onto Tasks on the menu and click +on the Agent Job to Add the Tasks that you will be configuring for the build process.
 
- 
+![alt text](./readme_images/ado_build_pipe_staging_add_tasks.png)
  
 8.	Type “CLI” in the Search Box and Click the Azure CLI”ADD” button four times.
- 
+
+![alt text](./readme_images/ado_build_pipe_add_cli_tasks.png)
 
 Your Agent Job Step should look like the following when you have completed.
 
- 
-
+![alt text](./readme_images/four_empty_cli_tasks.png)
  
 9.	Repeat Step 8, substituting the Search for “CLI” with Copy and add two Copy Files Tasks. 
 
- 
+ ![alt text](./readme_images/copy_files_task.png)
 
 10.	Substitute “Copy” with “Test” and add a Publish Test Results Task
  
+ ![alt text](./readme_images/publish_test_results_task.png)
+
 
 11.	Substitute “Test” with Coverage and add a Publish Code Coverage Results Task.
+
+ ![alt text](./readme_images/pub_code_coverage.png)
  
  Your Agent Job should now resemble the following:
- 
+
+ ![alt text](./readme_images/verify_ado_build_pipe_post_pub_cov_add.png)
 
 12.	The First Azure CLI Task will be used to configure the agent environment and make sure that the required packages are installed to execute the rest of the pipeline. Provide the task with a descriptive name, Select the appropriate Azure Subscription, set the Script Location to “Inline Script” and add the flowing to the inline script window:
 pip3 install -U setuptools
@@ -464,69 +474,29 @@ python3 -m install --upgrade pip
 pip3 install --upgrade azureml-sdk[notebooks]
 Set the remainder of the task properties as depicted below:
  
- 
+  ![alt text](./readme_images/ado_cli_task_1.png)
+
+  ![alt text](./readme_images/ado_cli_task_1_vars.png)
 
 13.	Click on the second Azure CLI Task, select the appropriate Azure Subscription and configure as follows:
-Display Name	Train Model
-Script Location	Inline Script
-Inline Script	python3 Project_One/notebooks/submit_run_db.py
-Access service principal details in script	Checked
-Use global Azure CLI configuration	Checked
-Working Directory	
+
+![alt text](./readme_images/ado_cli_task_2_config.png)
 
 14.	Click in the third Azure CLI Task , select the appropriate Azure Subscription and configure the Task as follows :
-Display Name	Build Inference Container
-Script Location	Inline Script
-Inline Script	#Creating Artifact and Test Results Directories
-mkdir ml_temp && cd ml_temp
-mkdir artifacts && cd artifacts
-mkdir test_results
 
-#Switching to Project Directory
-cd /
-cd $(System.DefaultWorkingDirectory)/Project_One
+![alt text](./readme_images/ado_cli_task_3_config.png)
 
-#Docker Build Inf Container
-echo "Building Inference Container"
-docker build -t mlbuild .
+![alt text](./readme_images/ado_cli_task_3_config_p2.png)
 
-#Run Built Container
-echo "Running Inference Container"
-docker run -e SUBSCRIPTION_ID=$(subscription-id) -e RESOURCE_GROUP=$(resource-group) -e WORKSPACE_NAME=$(ml-workspace-name) -e STATE=$(alg-state) -e AUTHOR=$(author) -e MODEL_NAME=$(model-name) -e IMAGE_NAME=$(image-name) --name mlbuild --rm -v $(Agent.HomeDirectory)/ml_temp/artifacts:/artifacts/ -v /home/vsts/.azure/:/root/.azure/ mlbuild
-Access service principal details in script	Checked
-Use global Azure CLI configuration	Checked
-Working Directory	$(Agent.HomeDirectory)
-The contents of inline script can be found in the Repo at Project_One/runbuild_pipeline.sh
 15.	Click the fourth Azure CLI Task, Select the appropriate Azure Subscription and configure the Task as follows:
-Display Name	Run Unit Tests
-Script Location	Inline Script
-Inline Script	cd ml_temp/artifacts
-str=$(jq -r '.image_location' artifacts.json)
 
-echo "################### Image to be tested ################### : " $str
-cd /
-cd $(System.DefaultWorkingDirectory)/Project_One-Tests
-echo "################### Updating Tests Docker File ################### "
-sed "s|<AZMLGENERATEDCONTAINER>|${str}|g" dockerfile.base > dockerfile
+![alt text](./readme_images/ado_cli_task_4_config_p1.png)
 
-echo "################### Logging into ACR ################### "
-docker login $ACR_NAME -u $ACR_USER -p $ACR_PASSWORD 
-echo "################### Building MLTESTS Image ################### "
-docker build -t mltests .
-echo "################### Running MLTests Container and Conducting Tests ################### "
-docker run --name mltests -v $(Agent.HomeDirectory)/ml_temp/artifacts/test_results:/var/azureml-app/tests/junit mltests
-echo "################### Ending Test Sequence ################### "
-sudo chown -R $(id -u):$(id -u) $(Agent.HomeDirectory)/ml_temp/artifacts/test_results/cov_html/
-Access service principal details in script	Checked
-Use global Azure CLI configuration	Checked
-Working Directory	$(Agent.HomeDirectory)
-The contents of inline script can be found in the Repo at Project_One-Tests/runtests_pipeline.sh
+![alt text](./readme_images/ado_cli_task_4_config_p2.png)
 
 16.	Click on the first Copy Files Task and configure the task as follows:
-Display Name	Copy Files to: $(build.artifactstagingdirectory)
-Source Folder	$(Agent.HomeDirectory)/ml_temp/artifacts/
-Contents	**
-Target Folder*	$(build.artifactstagingdirectory)
+
+![alt text](./readme_images/ado_copy_files_1.png)
 
  
  
@@ -570,3 +540,7 @@ Artifact publish location	Azure Pipelines/TFS
 You can now Save and Queue this pipeline for a manual build to make sure that it executes from end to end without any issues. 
 
 Output from the pipeline should resemble the following:
+ 
+
+
+
