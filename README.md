@@ -121,7 +121,7 @@ b.	Copy the objectID
 6.	Find the object ID in the list, click on it and give it Read, Write & Execute Access as well as Default.  Click Save
 ![alt text](./readme_images/grant_sp_dl_access.png)
 7.	Navigate to the Azure Portal and to the ADLS Gen Two Blade for this resource group.  Click on Access Control (IAM)
-![alt text](./readme_images/access_control_pane_adls_gen2.png)
+![alt text](./readme_images/acccess_control_pane_adls_gen2.png)
 8.	Click on “Add” “Add role assignment”
 ![alt text](./readme_images/add_role_adls_gen2.png)
 9.	The role should be: “Storage Blob Data Contributor” and enter the name for the service principal for this resource group you created and click save.
@@ -130,18 +130,18 @@ b.	Copy the objectID
 1.	Navigate to your workspace with the following format:
 a.	https://eastus.azuredatabricks.net/?o=6776691945951303#secrets/createScope 
 b.	Replace the number after o= with yours:
-i.	 
+![alt text](./readme_images/get_adb_workspace_id.png)
 c.	Or simply append #secrets/createScope to the end of the url of your workspace.
 2.	Navigate to the key vault for the resource group you are setting up:
-a.	 
+![alt text](./readme_images/navigate_key_vault.png)
 3.	Copy the DNS name
-a.	 
+![alt text](./readme_images/copy_kv_dns_name.png)
 4.	Copy the Resource ID
-a.	 
-5.	Name the scope “data-lake”, set for “All Users”.  Populate the dns name and resource id of the key vault. And select “Create”.
-a.	 
+![alt text](./readme_images/copy_kv_resource_id.png)
+5.	Name the scope “data-lake”, set for “All Users”.  Populate the dns name and resource id of the key vault. And select “Create".
+![alt text](./readme_images/adb_create_secret_scope.png)
 6.	From the databricks CLI, enter the command: “databricks secrets list-scopes –profile [YOUR PROFILE]
-a.	 
+![alt text](./readme_images/confirm_kv_backed_secret_scope.png)
 ###### Add Secrets to Secret Scope for Accessing Data
 You will need the Service Principal’s password and app id from the previous steps.
 1.	Get the app’s tenant id by executing the following command: “az ad sp show –id [AppId]”
@@ -150,7 +150,7 @@ a.	Copy the value from: “appOwnerTenantId”.
 a.	“az keyvault secret set –vault-name [KeyVault for RG] –name “sp-tenant-id” –value [TenantId]”
 3.	Add the Service Principal App-ID to the Azure Key Vault
 a.	“az keyvault secret set –vault-name [KeyVault for RG you are configuring] –name “sp-app-id” –value [service principal’s app id]
-b.	 
+![alt text](./readme_images/kv_add_sp_app_id_secret.png)
 4.	Add the Service Principal’s password to the Azure Key Vault
 a.	“az keyvault secret set –vault-name [KeyVault for RG] –name “sp-password” –value [password copied from earlier]
 5.	Add the Service Principal’s token endpoint
@@ -160,14 +160,7 @@ b.	“az keyvault secret set –vault-name [KeyVault for RG] –name “sp-token
 a.	“az keyvault secret set –vault-name [KeyVault for RG] –name “datalake-fqdn” –value “abfss://datalake@YOURSTORAGEACCOUNT.dfs.core.windows.net”
 7.	Verify secrets are in the data-lake scope for databricks
 a.	“databricks secrets list –scope data-lake”
-b.	 
 
-##### Verify Everything Works as Expected
-1.	Create a sample test mounting notebook.  Click on Workspace, Shared, Create, Notebook.  Name the notebook “test_setup”
-a.	 
-2.	Copy the code from: https://raw.githubusercontent.com/drcrook1/DataBricks_ML_DevOps/master/test_setup.py into the notebook
-3.	Press CTRL + ENTER to execute the cell block.  It may need to start the cluster which can take some time.  You should see the following output.
-a.	 
 #### Azure Dev Ops – Creation 
 This section covers creating a project in Azure Dev Ops for the workshop.
 1.	Navigate to https://dev.azure.com 
