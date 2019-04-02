@@ -10,71 +10,120 @@ Begin by creating 3 resource groups.
 •	[some-name]-db-dev
 •	[some-name]-db-pipeline
 •	[some-name]-db-prod
+
 ![alt text](./readme_images/add_resource_groups.png)
+
 ### Adding Resources to Resource Groups
 These steps should be completed for resource groups [some-name]-db-dev and [some-name]-db-pipeline.  [some-name]-db-prod will have different resources completely.
 #### Add Machine Learning Service Workspace
 1.	Select “Add a Resource”.
+
 ![alt text](./readme_images/add_resource.png)
+
 2.	Search for “machine learning” and select “Machine Learning service workspace” published by Microsoft.  Click Create
+
 ![alt text](./readme_images/add_ml_workspace.png)
+
 3.	Populate the fields with a naming convention that makes sense to you.  Select the correct resource group and ensure the location pairs with your other services.
+
 ![alt text](./readme_images/populate_ml_workspace_resource_creation_settings.png)
+
 #### Add Data Lake (Azure Storage gen 2)
 1.	Select “Add a Resource” form within a resource group pane.
+
 ![alt text](./readme_images/add_resource.png)
+
 2.	Search for “Storage” and select “Storage account” and click “create”
+
 ![alt text](./readme_images/select_storage_account.png)
+
 3.	Fill out the creation form.  Ensure you are in the correct resource group.  Give the account a name, ensure it is StorageV2 and set access tier to Cool.
 
 ![alt text](./readme_images/adls_gen2_basic_settings.png)
+
 4.	Click on “Advanced” and ensure “Hierarchical namespace” under “Data Lake Storage Gen2” is selected as “enabled”.
+
 ![alt text](./readme_images/adls_gen2_advanced_settings.png)
+
 5.	Select Create
 #### Add Azure Key Vault
 1.	Select “Add a Resource” from within a resource group pane.
+
 ![alt text](./readme_images/add_resource.png)
+
 2.	Search for “key vault” and select “Key Vault” published by Microsoft.
+
 ![alt text](./readme_images/add_keyvault.png)
+
 3.	Populate the creation form.  Give a name that is easy to remember and ensure the resource group is the desired resource group as well as the location.
+
 ![alt text](./readme_images/key_vault_creation_form.png)
+
 #### Add a DataBricks Cluster
 1.	Select “Add a Resource” from within a resource group pane.
+
 ![alt text](./readme_images/add_resource.png)
+
 2.	Search for DataBricks and select the one published by Microsoft.  Click “create”.
+
 ![alt text](./readme_images/add_adb.png)
+
 3.	Complete the Form for Creation using [some-name] as the workspace name, the resource group you are operating in for the resource group, select a location and ensure pricing tier is “Premium”.  We will be using RBAC controls.  
+
 ![alt text](./readme_images/adb_creation_form.png)
+
 4.	Navigate back to your resource group and select your newly created workspace
+
 ![alt text](./readme_images/select_adb_from_rg.png)
+
 5.	Select to “Launch Workspace” – Do not use the URL link. In the top right.
+
 ![alt text](./readme_images/launch_adb_workspace.png)
+
 6.	On the left hand pane, select “Clusters” and then “Create Cluster”
+
 ![alt text](./readme_images/create_adb_cluster.png)
+
 7.	Fill out the creation form.  MAKE SURE you select “terminate after 120 minutes of inactivity” to help reduce accidental usage and billing.
+
 ![alt text](./readme_images/adb_cluster_creation_form.png)
+
 #### Add AzureML SDK as Library to Cluster.
 1.	From the DataBricks Workspace, click on “Clusters” and then the cluster name.
+
 ![alt text](./readme_images/select_cluster_for_configure.png)
+
 2.	Click on the Libraries Tab, Install New, PyPl and enter “azureml-sdk”.  Click Install
+
 ![alt text](./readme_images/add_azml_sdk_to_cluster.png)
+
 #### Add Initial Data to Storage
 We want to ensure there is some data in the various data lakes so folks can access it.
 1.	Download the file: https://amldockerdatasets.azureedge.net/AdultCensusIncome.csv 
 2.	Select the storage v2 from your resource group.
+
 ![alt text](./readme_images/select_storage_gen2.png)
+
 3.	Select Storage Explorer (Preview)
+
 ![alt text](./readme_images/select_storage_explorer.png)
+
 ![alt text](./readme_images/select_storage_explorer_2.png)
+
 4.	Expand the expand “Blob Containers”.  Right Click Blob Containers and select “Create Blob Container”
 
 ![alt text](./readme_images/create_blob_container.png)
+
 5.	Name the container “datalake”
 6.	Locate the AdultCensusIncome.csv file you downloaded previously.
 7.	Drag & Drop the file into the pane of the container
+
 ![alt text](./readme_images/drag_and_drop_data_file.png)
+
 8.	Select “Refresh”.  You should see the .csv show up in the pane.
+
 ![alt text](./readme_images/refresh_data_store_view.png)
+
 #### Create Secrets for Secure & Controlled Storage Mounts
 We parameterize out a few extra values such that the code for mounting data can remain the same regardless of which databricks cluster it is attached to and the access to data is controlled by a cluster & data lake admin instead.  These steps should be completed for each databricks workspace within each resource group.
 ##### Install Azure & Data Bricks CLI
@@ -88,14 +137,22 @@ a.	Open a cmd prompt and execute the command: “pip install azure-cli”
 ##### Configure Data Bricks CLI for User
 ###### Generate a User Access Token
 1.	Launch the DataBricks Workspace from the Azure Portal
+
 ![alt text](./readme_images/launch_adb_workspace.png)
+
 2.	In the upper right hand side of the screen, select the user icon.
+
 ![alt text](./readme_images/select_adb_user_icon.png)
+
 3.	Select “User Settings” from the drop down.
 4.	Select “Generate a New Token”
+
 ![alt text](./readme_images/generate_adb_token.png)
+
 5.	Give a good comment and remove the token lifetime (gives permanent token access to cluster; not a best practice)
+
 ![alt text](./readme_images/adb_token_life.png)
+
 6.	Copy the token that gets generated.
 ###### Authenticate CLI with Token using Profiles
 1.	Use the command “databricks configure --token --profile [PROFILENAME]
@@ -113,35 +170,61 @@ a.	Copy the app id
 b.	COPY the password – you will not be able to get it again.
 3.	Get the Service Principal’s object id by executing the command: “az ad sp show –id [AppId]”.  Search through the result and find the value of the property “objectId”
 b.	Copy the objectID
+
 ![alt text](./readme_images/copy_sp_obj_id.png)
+
 4.	Open Azure Storage Explorer and right click the datalake container you created previously.  Select “Manage Access”
+
 ![alt text](./readme_images/manage_dl_access.png)
+
 5.	Paste the objectID into the text box and click “Add”
+
 ![alt text](./readme_images/paste_obj_id_as_user_to_dl.png)
+
 6.	Find the object ID in the list, click on it and give it Read, Write & Execute Access as well as Default.  Click Save
+
 ![alt text](./readme_images/grant_sp_dl_access.png)
+
 7.	Navigate to the Azure Portal and to the ADLS Gen Two Blade for this resource group.  Click on Access Control (IAM)
+
 ![alt text](./readme_images/acccess_control_pane_adls_gen2.png)
+
 8.	Click on “Add” “Add role assignment”
+
 ![alt text](./readme_images/add_role_adls_gen2.png)
+
 9.	The role should be: “Storage Blob Data Contributor” and enter the name for the service principal for this resource group you created and click save.
+
 ![alt text](./readme_images/adls_gen2_role_add_form.png)
+
 ###### Create an Azure Key Vault Backed Secret Scope
 1.	Navigate to your workspace with the following format:
 a.	https://eastus.azuredatabricks.net/?o=6776691945951303#secrets/createScope 
 b.	Replace the number after o= with yours:
+
 ![alt text](./readme_images/get_adb_workspace_id.png)
+
 c.	Or simply append #secrets/createScope to the end of the url of your workspace.
 2.	Navigate to the key vault for the resource group you are setting up:
+
 ![alt text](./readme_images/navigate_key_vault.png)
+
 3.	Copy the DNS name
+
 ![alt text](./readme_images/copy_kv_dns_name.png)
+
 4.	Copy the Resource ID
+
 ![alt text](./readme_images/copy_kv_resource_id.png)
+
 5.	Name the scope “data-lake”, set for “All Users”.  Populate the dns name and resource id of the key vault. And select “Create".
+
 ![alt text](./readme_images/adb_create_secret_scope.png)
+
 6.	From the databricks CLI, enter the command: “databricks secrets list-scopes –profile [YOUR PROFILE]
+
 ![alt text](./readme_images/confirm_kv_backed_secret_scope.png)
+
 ###### Add Secrets to Secret Scope for Accessing Data
 You will need the Service Principal’s password and app id from the previous steps.
 1.	Get the app’s tenant id by executing the following command: “az ad sp show –id [AppId]”
@@ -150,7 +233,9 @@ a.	Copy the value from: “appOwnerTenantId”.
 a.	“az keyvault secret set –vault-name [KeyVault for RG] –name “sp-tenant-id” –value [TenantId]”
 3.	Add the Service Principal App-ID to the Azure Key Vault
 a.	“az keyvault secret set –vault-name [KeyVault for RG you are configuring] –name “sp-app-id” –value [service principal’s app id]
+
 ![alt text](./readme_images/kv_add_sp_app_id_secret.png)
+
 4.	Add the Service Principal’s password to the Azure Key Vault
 a.	“az keyvault secret set –vault-name [KeyVault for RG] –name “sp-password” –value [password copied from earlier]
 5.	Add the Service Principal’s token endpoint
@@ -166,33 +251,50 @@ This section covers creating a project in Azure Dev Ops for the workshop.
 1.	Navigate to https://dev.azure.com 
 2.	Select the organization you intend to use OR create a new organization.
 3.	Create a new project.  Pick a name, description.  Select “Git” for version control and “Agile” for the work item process.
+
 ![alt text](./readme_images/create_ado_project.png)
+
 4.	Invite Additional Users
+
 ![alt text](./readme_images/add_ado_user_1.png)
+
 ![alt text](./readme_images/add_ado_user_2.png)
+
 5.	Click on Repos, Files.
 6.	At the very bottom, select “Initialize Repo”.
 ##### Scientists – Initial Setup
 Configure Azure Dev Ops Integrations
  Azure Databricks, set your Git provider to Azure DevOps Services on the User Settings page:
 1.	Click the User icon   at the top right of your screen and select User Settings.
+
 ![alt text](./readme_images/adb_user_settings.png)
+
 2.	Click the Git Integration tab.
 3.	Change your provider to Azure DevOps Services.
+
 ![alt text](./readme_images/ado_git_provider_adb.png)
+
 ##### Create & Link Project File w/ Repo
 1.	From inside the Data Bricks cluster interface, select workspace, shared, then the drop down, then create and create a “Folder”
+
 ![alt text](./readme_images/adb_create_folder.png)
+
 2.	Name the folder “Project_One”
 3.	Create a new file inside the project called “train_model”.
+
 ![alt text](./readme_images/adb_create_notebook.png)
+
 4.	Link “train_model.py” file to your Azure Dev Ops repository.
 a.	Copy the git link from your azure dev ops portal:
+
 ![alt text](./readme_images/copy_ado_git_link.png)
+
 b.	Paste into the “link” location in the popup for “Git Preferences”
 c.	Create a new branch.  Name it your unique user ID
 d.	Use “Project_One/notebooks/train_model.py” as the path in git repo.
+
 ![alt text](./readme_images/adb_git_link_settings_form.png)
+
 # Dev Loop Experience
 The dev loop experience encompasses mounting the dev data, exploring that data, training a model; writing the inference code, compiling a dev container; running tests inside the dev container.
 ## Train the world’s worst regression & Stage for inference coding.
@@ -256,16 +358,24 @@ From the command prompt:
 1.	Change directory into the Project_One folder.
 2.	Run the runbuild_local.cmd
 a.	You may need to execute az login prior to executing this command or be interactively logged in (watch the output)
+
 ![alt text](./readme_images/run_build_local.png)
+
 c.	This will execute a bunch of stuff and be on “Creating image” for a while.  Occasionally hit enter to see if the cmd prompt output is up to date or not.
+
 ![alt text](./readme_images/successful_local_build.png)
+
 ### Test Inference Container
 1.	Change directory into the Project_One-Tests folder.
 2.	Run the runtests_local.cmd file
 3.	This will extend the container you created in the previous step, run your unit tests and check your code coverage.  The code coverage results can be found in C:/ml_temp/artifacts/test_results  These are standard pytest and pytest-cov result outputs.
+
 ![alt text](./readme_images/test_results.png)
+
 5.	Click on index.html from cov_html folder
+
 ![alt text](./readme_images/local_test_results_web.png)
+
 7.	We have 68% code coverage; could be worse.
 ## Commit & Pull Request.
 1.	We now know that we have an inference container and it passes our unit tests and our code coverage is to a point where we are happy about it.
@@ -275,9 +385,13 @@ a.	Git add ./
 b.	Git commit -m “works”
 c.	Git push
 4.	Create a pull request by going to your ADO site, under repos, pull request, New Pull Request
+
 ![alt text](./readme_images/create_pull_request.png)
+
 5.	Populate the request template and ensure you have a reviewer:
+
 ![alt text](./readme_images/PR_options_form.png)
+
 6.	Review the changes with the reviewer you selected.  Ensure both enter ADO and hit “Approve” and then “Complete”.  If you see problems in your peers code; add comments and reject it.  Once both reviewers Approve you can complete.  This will launch the build pipelines & release pipelines which are connected to master.
  
 # Defining your Build Pipeline
@@ -288,25 +402,31 @@ Since we are targeting a different Azure Databricks Environment than the one use
 
 1.	In your Azure DevOps Subscription navigate to the Library Menu Item and click + Variable Group
 
- 
- 
+![alt text](./readme_images/create_variable_group_ado.png)
+
 2.	Name your variable group as indicated and select the Azure Subscription and KeyVault that you wish to target and toggle the “Link secrets from an Azure key vault as variables” switch to the on position
  
- 
+ ![alt text](./readme_images/ado_variable_group_form.png)
 
 3.	Click the + Add button, select the variables that you want to make available to the pipeline, click ok and then Save to make sure that your changes are persisted to your Azure DevOps instance
  
+![alt text](./readme_images/ado_variable_group_available_to_pipeline.png)
 
 ## Create a Build Pipeline in the Visual Designer
 
 The intention of this step is to create an Azure DevOps Pipeline that will mimic the steps from the Local Build Loop, but targets a different Azure Databrick Environment for the training .The connection details of this environment will not be available to the scientists directly and will be managed by the operations team. This pipeline will execute when a PR to master is approved and completed.
 1.	In your Azure DevOps tenant, navigate to Pipelines -> Builds and click on + New and select New build pipeline.
  
- 
+![alt text](./readme_images/ado_new_build_pipeline.png)
+
 2.	Select your source and make sure to select the master branch as we want to make sure that the pipeline is attached the branch that we will be monitoring for Pull Requests. Click Continue.
- 
+
+![alt text](./readme_images/ado_build_pipe_repo_type.png)
+
 3.	Select Empty Job 
- 
+
+![alt text](./readme_images/ado_build_pipe_select_empty_job.png)
+
 4.	Name your Pipeline accordingly and select the Hosted Ubuntu 1604 Build Agent from the Agent Pool.
  
 5.	Link the variable group that you created earlier by clicking on Variables in the menu bar, followed by Variable groups and click Link Variable Groups.
