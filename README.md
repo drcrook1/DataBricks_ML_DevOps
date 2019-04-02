@@ -26,53 +26,55 @@ These steps should be completed for resource groups [some-name]-db-dev and [some
 2.	Search for “Storage” and select “Storage account” and click “create”
 ![alt text](./readme_images/select_storage_account.png)
 3.	Fill out the creation form.  Ensure you are in the correct resource group.  Give the account a name, ensure it is StorageV2 and set access tier to Cool.
+
 ![alt text](./readme_images/adls_gen2_basic_settings.png)
 4.	Click on “Advanced” and ensure “Hierarchical namespace” under “Data Lake Storage Gen2” is selected as “enabled”.
 ![alt text](./readme_images/adls_gen2_advanced_settings.png)
 5.	Select Create
 #### Add Azure Key Vault
 1.	Select “Add a Resource” from within a resource group pane.
-a.	 
+![alt text](./readme_images/add_resource.png)
 2.	Search for “key vault” and select “Key Vault” published by Microsoft.
-a.	 
+![alt text](./readme_images/add_keyvault.png)
 3.	Populate the creation form.  Give a name that is easy to remember and ensure the resource group is the desired resource group as well as the location.
-a.	 
+![alt text](./readme_images/key_vault_creation_form.png)
 #### Add a DataBricks Cluster
 1.	Select “Add a Resource” from within a resource group pane.
- 
+![alt text](./readme_images/add_resource.png)
 2.	Search for DataBricks and select the one published by Microsoft.  Click “create”.
- 
+![alt text](./readme_images/add_adb.png)
 3.	Complete the Form for Creation using [some-name] as the workspace name, the resource group you are operating in for the resource group, select a location and ensure pricing tier is “Premium”.  We will be using RBAC controls.  
-a.	 
+![alt text](./readme_images/adb_creation_form.png)
 4.	Navigate back to your resource group and select your newly created workspace
- 
+![alt text](./readme_images/select_adb_from_rg.png)
 5.	Select to “Launch Workspace” – Do not use the URL link. In the top right.
- 
+![alt text](./readme_images/launch_adb_workspace.png)
 6.	On the left hand pane, select “Clusters” and then “Create Cluster”
- 
+![alt text](./readme_images/create_adb_cluster.png)
 7.	Fill out the creation form.  MAKE SURE you select “terminate after 120 minutes of inactivity” to help reduce accidental usage and billing.
- 
+![alt text](./readme_images/adb_cluster_creation_form.png)
 #### Add AzureML SDK as Library to Cluster.
 1.	From the DataBricks Workspace, click on “Clusters” and then the cluster name.
-a.	 
+![alt text](./readme_images/select_cluster_for_configure.png)
 2.	Click on the Libraries Tab, Install New, PyPl and enter “azureml-sdk”.  Click Install
-a.	 
+![alt text](./readme_images/add_azml_sdk_to_cluster.png)
 #### Add Initial Data to Storage
 We want to ensure there is some data in the various data lakes so folks can access it.
 1.	Download the file: https://amldockerdatasets.azureedge.net/AdultCensusIncome.csv 
 2.	Select the storage v2 from your resource group.
-a.	 
+![alt text](./readme_images/select_storage_gen2.png)
 3.	Select Storage Explorer (Preview)
-a.	 
-b.	 
+![alt text](./readme_images/select_storage_explorer.png)
+![alt text](./readme_images/select_storage_explorer_2.png)
 4.	Expand the expand “Blob Containers”.  Right Click Blob Containers and select “Create Blob Container”
-a.	 
+
+![alt text](./readme_images/create_blob_container.png)
 5.	Name the container “datalake”
 6.	Locate the AdultCensusIncome.csv file you downloaded previously.
 7.	Drag & Drop the file into the pane of the container
-a.	 
+![alt text](./readme_images/drag_and_drop_data_file.png)
 8.	Select “Refresh”.  You should see the .csv show up in the pane.
-a.	 
+![alt text](./readme_images/refresh_data_store_view.png)
 #### Create Secrets for Secure & Controlled Storage Mounts
 We parameterize out a few extra values such that the code for mounting data can remain the same regardless of which databricks cluster it is attached to and the access to data is controlled by a cluster & data lake admin instead.  These steps should be completed for each databricks workspace within each resource group.
 ##### Install Azure & Data Bricks CLI
@@ -86,14 +88,14 @@ a.	Open a cmd prompt and execute the command: “pip install azure-cli”
 ##### Configure Data Bricks CLI for User
 ###### Generate a User Access Token
 1.	Launch the DataBricks Workspace from the Azure Portal
-a.	 
+![alt text](./readme_images/launch_adb_workspace.png)
 2.	In the upper right hand side of the screen, select the user icon.
-a.	 
+![alt text](./readme_images/select_adb_user_icon.png)
 3.	Select “User Settings” from the drop down.
 4.	Select “Generate a New Token”
-a.	 
+![alt text](./readme_images/generate_adb_token.png)
 5.	Give a good comment and remove the token lifetime (gives permanent token access to cluster; not a best practice)
-a.	 
+![alt text](./readme_images/adb_token_life.png)
 6.	Copy the token that gets generated.
 ###### Authenticate CLI with Token using Profiles
 1.	Use the command “databricks configure --token --profile [PROFILENAME]
@@ -110,20 +112,20 @@ a.	Follow instructions printed out.
 a.	Copy the app id
 b.	COPY the password – you will not be able to get it again.
 3.	Get the Service Principal’s object id by executing the command: “az ad sp show –id [AppId]”.  Search through the result and find the value of the property “objectId”
-a.	 
 b.	Copy the objectID
+![alt text](./readme_images/copy_sp_obj_id.png)
 4.	Open Azure Storage Explorer and right click the datalake container you created previously.  Select “Manage Access”
-a.	 
+![alt text](./readme_images/manage_dl_access.png)
 5.	Paste the objectID into the text box and click “Add”
-a.	 
+![alt text](./readme_images/paste_obj_id_as_user_to_dl.png)
 6.	Find the object ID in the list, click on it and give it Read, Write & Execute Access as well as Default.  Click Save
-a.	 
+![alt text](./readme_images/grant_sp_dl_access.png)
 7.	Navigate to the Azure Portal and to the ADLS Gen Two Blade for this resource group.  Click on Access Control (IAM)
-a.	 
+![alt text](./readme_images/access_control_pane_adls_gen2.png)
 8.	Click on “Add” “Add role assignment”
-a.	 
+![alt text](./readme_images/add_role_adls_gen2.png)
 9.	The role should be: “Storage Blob Data Contributor” and enter the name for the service principal for this resource group you created and click save.
-a.	 
+![alt text](./readme_images/adls_gen2_role_add_form.png)
 ###### Create an Azure Key Vault Backed Secret Scope
 1.	Navigate to your workspace with the following format:
 a.	https://eastus.azuredatabricks.net/?o=6776691945951303#secrets/createScope 
