@@ -498,49 +498,48 @@ Set the remainder of the task properties as depicted below:
 
 ![alt text](./readme_images/ado_copy_files_1.png)
 
- 
- 
+![alt text](./readme_images/ado_copy_files_1_p2.png)
 
 17.	Click on the second Copy Files Task and configure the task as follows:
-Display Name	Copy Files to: $(build.artifactstagingdirectory)/test_results
-Source Folder	$(Agent.HomeDirectory)/ml_temp/artifacts/test_results
-Contents	**
-Target Folder*	$(build.artifactstagingdirectory)/test_results
 
+![alt text](./readme_images/ado_copy_files_3_p1.png)
+
+![alt text](./readme_images/ado_copy_files_2_p2.png)
  
 18.	Click on the Publish Test Results Task and Configure the task as follows:
-Display Name	Publish Test Results test-results.xml
-Test result format*	JUnit
-Test result files	test-results.xml
-Search Folder*	$(Agent.HomeDirectory)/ml_temp/artifacts/test_results
 
+![alt text](./readme_images/ado_pub_test_p1.png)
+
+![alt text](./readme_images/ado_pub_test_p2.png)
  
 19.	Click on the Publish Code Coverage Task and configure the task as follows:
-Display Name	Publish code coverage from $(Agent.HomeDirectory)/ml_temp/artifacts/test_results/coverage.xml
-Code Coverage Tool*	Cobertura
-Summary File	$(Agent.HomeDirectory)/ml_temp/artifacts/test_results/coverage.xml
-Report Directory	$(Agent.HomeDirectory)/ml_temp/artifacts/test_results/cov_html
 
- 
+![alt text](./readme_images/ado_pub_test_cov_p1.png)
+
+ ![alt text](./readme_images/ado_pub_test_cov_p2.png)
+
 20.	 On the Agent Job Click the + in order to add a task that will be used to publish the build artifacts for use in a release pipeline later.
- 
+
+ ![alt text](./readme_images/ado_add_task.png)
+
 Search for Publish and Click “Add” on the Publish Build Artifacts Task
  
+ ![alt text](./readme_images/ado_add_pub_artifacts.png)
 
 Configure the task as follows:
-Display name	Publish Artifact: PipelineArtifacts
-Path to publish	$(Build.ArtifactStagingDirectory)
-Artifact name	PipelineArtifacts
-Artifact publish location	Azure Pipelines/TFS
 
+ ![alt text](./readme_images/ado_add_pub_artifacts_config.png)
+
+![alt text](./readme_images/ado_add_pub_artifacts_config_p2.png)
  
 21.	Enable the Continuous Integration trigger on the pipeline which will make sure that every time a change in made to the master branch of the repository this pipeline will execute. Click the Triggers menu item in the menu bar and click the checkbox to enable continuous integration.
  
+![alt text](./readme_images/ado_cont_int_trigger.png)
 
 You can now Save and Queue this pipeline for a manual build to make sure that it executes from end to end without any issues. 
 
 Output from the pipeline should resemble the following:
  
-
+![alt text](./readme_images/ado_output_successful_build.png)
 
 
