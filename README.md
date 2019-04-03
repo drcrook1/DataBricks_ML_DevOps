@@ -1,4 +1,7 @@
 # Data Bricks HOL  - Python & Dev Ops
+## TODOs
+1.  Discuss steps regarding zipping this repo and putting into the participant's ADO
+2.  
 ## Hands on Lab – Abstract
 This hands on lab is designed for the scenario where a team of scientists and engineers are responsible for the development, maintenance and quality of analytical models which are made available to other teams for consumption.
 ## Infrastructure Set Up
