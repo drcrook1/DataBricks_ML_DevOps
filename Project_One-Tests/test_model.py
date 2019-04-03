@@ -15,3 +15,6 @@ class TestModel(object):
         m = MyModel()
         m.init()
         assert(m.x_scaler is not None)
+        assert(m.y_scaler is not None)
+        assert(m.model is not None)
+        

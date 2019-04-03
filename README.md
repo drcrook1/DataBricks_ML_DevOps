@@ -542,4 +542,74 @@ Output from the pipeline should resemble the following:
  
 ![alt text](./readme_images/ado_output_successful_build.png)
 
+## Defining your Release Pipeline
+
+While release pipelines are often used to deliver artifacts in a deployed state, our scenario calls for an different approach. Our build artifact is an image that contains our tested model and we will be creating a Two Stage Release that will first deliver the correct image to aQA environment where it can be picked up and be tested by a product team. Once all conditions for the product team is satisfied a release manager will manually approve the Production release step and the model will become available for consumption in the Production Environment.
+Creating Variable Groups Required for the Release Pipeline
+1.	Click on the Library menu item in the Azure DevOps portal and click 
+
+![alt text](./readme_images/ado_rp_add_variable_group.png)
+
+2.	Complete the resulting form as depicted below, making sure that you provide values to the variables that correspond to the Targeted QA Environment
+
+![alt text](./readme_images/ado_rp_qa_variable_form.png) 
+
+3.	After each Variable Value has been assigned click the   to encrypt its value in the pipeline.
+4.	Repeat Steps 2 and 3 above to set up a variable group for the targeted Production Environment.
+### Create the Release Pipeline
+1.	In the Azure DevOps portal Click on Pipelines -> Releases in the left menu
+
+![alt text](./readme_images/ado_rp_rp_button_click.png) 
+
+2.	Click The New pipeline menu item and select New release pipeline 
+
+![alt text](./readme_images/ado_rp_new_rp.png) 
+
+3.	Add Two Stages, Named QA and Production Respectively ensuring that you select the “Empty Template”. Click on the Pre-deployment condition icon     and continue to configure as depicted below. This will prevent the Production deployment from happening automatically unless there is an Approval provided by One or all of the Approvers (dependent on configuration) and that the Production Stage Deployment will timeout after two days with out an approval.
+
+![alt text](./readme_images/ado_rp_gated_prod.png) 
+
+4.	Add the build artifacts and link the release pipeline to its associated build pipeline.
+
+![alt text](./readme_images/ado_rp_add_build_artifacts.png) 
+
+Note: The value  in the Source alias text area will be required to correctly configure the AZ CLI tasks in Steps 6 and 7 below.
+ 
+
+5.	In the Menu area select variables and link the QA and Production variable to the relevant slots.
+
+![alt text](./readme_images/ado_rp_link_variable_groups.png) 
+
+6.	Add a CLI Task to the QA Stage and configure it as follows :
+
+![alt text](./readme_images/ado_rp_qa_cli_1.png) 
+
+![alt text](./readme_images/ado_rp_qa_cli_2.png) 
+
+** Make sure that the working directory set above reflects the generated path correct path here
+$(System.DefaultWorkingDirectory)/<Insert Correct Path Here>/PipelineArtifacts
+
+7.	Repeat Step 6 above for the Production Stage . 
+
+Note that the script internals are identical for both stages but will target different destination repositories based on the Variables groups assigned to each of the stages.
+
+![alt text](./readme_images/ado_rp_prod_cli_reveal.png) 
+
+8.	Run a release and inspect the results
+9.	To automate the release process click the Continuous Integration Trigger of the Build Artifact and set as follows.
+
+![alt text](./readme_images/ado_rp_automate_rp.png) 
+
+![alt text](./readme_images/ado_rp_automate_rp_2.png) 
+
+10.	Finally click on the Pre-Release Condition for the QA Stage    and set as follows.
+
+![alt text](./readme_images/ado_rp_qa_prerelease_condition.png) 
+ 
+11.	A successful release will resemble the following
+ 
+![alt text](./readme_images/ado_rp_success_1.png)
+
+![alt text](./readme_images/ado_rp_success_2.png)
+ 
 
