@@ -238,10 +238,31 @@ a.	“az keyvault secret set –vault-name [KeyVault for RG you are configuring]
 4.	Add the Service Principal’s password to the Azure Key Vault
 a.	“az keyvault secret set –vault-name [KeyVault for RG] –name “sp-password” –value [password copied from earlier]
 5.	Add the Service Principal’s token endpoint
-a.	https://login.microsoftonline.com/<YOUR appOwnerTenantId>/oauth2/token
+a.	https://login.microsoftonline.com/YOURAPPOWNERTENANTID/oauth2/token
 b.	“az keyvault secret set –vault-name [KeyVault for RG] –name “sp-token-endpoint” –value [token endpoint]
 6.	Add the FQDN of the data lake.
 a.	“az keyvault secret set –vault-name [KeyVault for RG] –name “datalake-fqdn” –value “abfss://datalake@YOURSTORAGEACCOUNT.dfs.core.windows.net”
+7.  Add the subscription id for the ml service.  Navigate to the ml service inside your resource group and copy the subscription id.
+    1.  "az keyvault secret set --vault-name [KeyVault for RG] --name subscription-id --value YOURSUBSCRIPTIONID
+
+![alt text](./readme_images/mlservice_subscription_id.png)
+
+8.  Add the resource group for the ml service.  Navigate to the ml service inside your resource group and copy the resource group id.
+    1.  "az keyvault secret set --vault-name [KeyVault for RG] --name resource-group --value YOURRGNAME
+
+![alt text](./readme_images/mlservice_rg_name.png)
+
+9.  Add the ml service workspace name.  Navigate to the ml service within the appropriate resource group and copy the name.
+    1.  "az keyvault secret set --vault-name [KeyVault for RG] --name ml-workspace-name --value YOURVALUE
+
+![alt text](./readme_images/mlservice_name.png)
+
+10.  Add the "Alg State"  This changes per resource group.  For the Dev RG, it is "dev", for "Pipeline" it is "pipeline".  If you were to add additional clusters for releases for multi-tenancy it should have a convention to help support that.
+     1.   "az keyvault secret set --vault-name [KeyVault for RG] --name alg-state --value APPROPRIATEVALUE
+
+11.  Add the "Created By".  For now this will simply match "Alg State"'s conventions.
+     1.   "az keyvault secret set --vault-name [KeyVault for RG] --name created-by --value APPROPRIATEVALUE
+
 7.	Verify secrets are in the data-lake scope for databricks
 a.	“databricks secrets list –scope data-lake”
 
