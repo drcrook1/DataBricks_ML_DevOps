@@ -1,9 +1,7 @@
 # Databricks notebook source
 # FUTURE SERVICE PRINCIPAL STUFF FOR MOUNTING
 secrets = {}
-secrets["blob_name"] = dbutils.secrets.get(scope = "data-lake", key = "blob-name")
-secrets["blob_key"] = dbutils.secrets.get(scope = "data-lake", key = "blob-key") 
-secrets["container_name"] = dbutils.secrets.get(scope = "data-lake", key = "container-name")
+secrets["datalake_fqdn"] = dbutils.secrets.get(scope = "data-lake", key = "datalake-fqdn")
 secrets["subscription_id"] = dbutils.secrets.get(scope = "data-lake", key = "subscription-id")
 secrets["resource_group"] = dbutils.secrets.get(scope = "data-lake", key = "resource-group")
 secrets["ml_workspace_name"] = dbutils.secrets.get(scope = "data-lake", key = "ml-workspace-name")
@@ -12,27 +10,10 @@ secrets["sp_app_id"] = dbutils.secrets.get(scope = "data-lake", key = "sp-app-id
 secrets["sp_password"] = dbutils.secrets.get(scope = "data-lake", key = "sp-password")
 secrets["sp_tenant_id"] = dbutils.secrets.get(scope = "data-lake", key = "sp-tenant-id")
 secrets["sp_token_endpoint"] = dbutils.secrets.get(scope = "data-lake", key = "sp-token-endpoint")
-try:
-  secrets["created_by"] = dbutils.secrets.get(scope = "data-lake", key = "created-by")
-except Exception as e:
-  print("falling back to user set created_by")
+secrets["created_by"] = dbutils.secrets.get(scope = "data-lake", key = "created-by")
+if(secrets["created_by"] == "dev"):
+  print("dev state, replacing with specific dev alias.")
   secrets["created_by"] = "dacrook"
-
-# COMMAND ----------
-
-#
-# THIS IS FOR BLOB MOUNTING
-#
-#create the config variable to pass into mount
-#configs = {"fs.azure.account.key." + secrets["blob_name"] + ".blob.core.windows.net":"" + secrets["blob_key"] + ""}
-
-#try:
-  #mounting the external blob storage as mount point datalake for data storage.
-#  dbutils.fs.mount( source = "wasbs://" + secrets["container_name"] + "@" + secrets["blob_name"] + ".blob.core.windows.net/", 
-#                   mount_point = "/mnt/datalake/", 
- #                  extra_configs = configs)
-#except Exception as e:
-#  print("already mounted; no need to do so.")
 
 # COMMAND ----------
 
@@ -48,7 +29,7 @@ configs = {"fs.azure.account.auth.type": "OAuth",
 try:
   #mounting the external blob storage as mount point datalake for data storage.
   dbutils.fs.mount(
-    source = "abfss://" + secrets["container_name"] + "@" + secrets["storage_account_name"] + ".dfs.core.windows.net", #blobcontainername@storageaccount
+    source = secrets["datalake_fqdn"], #blobcontainername@storageaccount
     mount_point = "/mnt/datalake",
     extra_configs = configs)
 except Exception as e:
