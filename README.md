@@ -104,25 +104,24 @@ We want to ensure there is some data in the various data lakes so folks can acce
 
 ![alt text](./readme_images/select_storage_gen2.png)
 
-3.	Select Storage Explorer (Preview)
+3.	Select File Systems from the pane on the left and click "+ File system"
 
-![alt text](./readme_images/select_storage_explorer.png)
+![alt text](./readme_images/adls_add_filesystem.png)
 
-![alt text](./readme_images/select_storage_explorer_2.png)
 
-4.	Expand the expand “Blob Containers”.  Right Click Blob Containers and select “Create Blob Container”
+4.	Name the file system "datalake"
+5.  Click on the newly created "datalake" file system
 
-![alt text](./readme_images/create_blob_container.png)
+![alt text](./readme_images/adls_select_filesystem.png)
 
-5.	Name the container “datalake”
-6.	Locate the AdultCensusIncome.csv file you downloaded previously.
-7.	Drag & Drop the file into the pane of the container
+6.  Select "Download Azure Storage Explorer" if you do not already have it installed.
+7.  Once Azure Storage Explorer is installed, open it.  Add an Account and Login using your Azure credentials.
 
-![alt text](./readme_images/drag_and_drop_data_file.png)
+![alt text](./readme_images/storage_explorer_add_account.png)
 
-8.	Select “Refresh”.  You should see the .csv show up in the pane.
+8.  Find your filesystem inside the account you have now added.  Drag and drop the AdultCensusIncome.csv into the main pane.  Click Refresh if it does not refresh automatically.
 
-![alt text](./readme_images/refresh_data_store_view.png)
+![alt text](./readme_images/storage_explorer_add_data.png)
 
 #### Create Secrets for Secure & Controlled Storage Mounts
 We parameterize out a few extra values such that the code for mounting data can remain the same regardless of which databricks cluster it is attached to and the access to data is controlled by a cluster & data lake admin instead.  These steps should be completed for each databricks workspace within each resource group.
