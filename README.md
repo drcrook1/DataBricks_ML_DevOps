@@ -269,8 +269,14 @@ a.	“az keyvault secret set –vault-name [KeyVault for RG] –name “datalake
 7.	Verify secrets are in the data-lake scope for databricks
 a.	“databricks secrets list –scope data-lake”
 
-#### Azure Dev Ops – Creation 
+### Azure Dev Ops 
+
+Azure Dev Ops is a fully integrated Dev Ops tool with work item features, version control, build and release.  It can also be used to stitch together a variety of other tools into one central dev ops plane.
+
+#### Creation 
+
 This section covers creating a project in Azure Dev Ops for the workshop.
+
 1.	Navigate to https://dev.azure.com 
 2.	Select the organization you intend to use OR create a new organization.
 3.	Create a new project.  Pick a name, description.  Select “Git” for version control and “Agile” for the work item process.
@@ -285,6 +291,51 @@ This section covers creating a project in Azure Dev Ops for the workshop.
 
 5.	Click on Repos, Files.
 6.	At the very bottom, select “Initialize Repo”.
+
+#### Seed the Repo
+
+We are going to seed your newly created repository with this repository to reduce mistakes during the workshop as well as be able to focus on what everything is doing as opposed to copy/pasting.  This activity should be done only once per new repo.
+
+1.  navigate to https://github.com/drcrook1/DataBricks_ML_DevOps click "Clone or download" and then "Download ZIP"
+
+![alt text](./readme_images/download_repo_as_zip.png)
+
+**This will have downloaded to your default "downloads" location. 
+
+2.  Create a new empty folder to hold your projects or navigate to the one you usually use.  I personally use "C:/projects".
+3.  Copy the git url for your ADO repository
+
+![alt text](./readme_images/copy_clone_git_repo_link.png)
+
+**Note, that you may have to "Generate Git credentials" if you have not done so before.
+
+4.  Navigate to your normal projects folder (C:/projects for me) and execute the command: "git clone PASTEURL"
+    1.  This will generate a new folder in it.  The name will be http friendly with special characters (feel free to remove those)
+
+5.  Extract the zip file you downloaded earlier.  Copy all files *except* the .git folder
+
+![alt text](./readme_images/not_this_folder.png)
+
+6.  your folder structure should be similar to mine:
+
+  FOLDER STRUCTURE
+
+    - C:/projects/
+        - YOUR REPO NAME /
+          - Project_One/
+          - Project_One-Tests/
+          - readme_images/
+          - .git/ (not extracted one)
+          - .pptx (possibly a few)
+          - .gitignore
+          - README.md
+
+7.  Open a command prompt and use "cd" to change into the your projects repo.  For me the command would be: "cd C:/projects/YOUR_REPO_NAME"
+8.  Execute the cmd "git add ./"
+9.  Execute the cmd "git commit -m "initial repo seed""
+10. Execute the cmd "git push"
+11. Your remote repository should now be seeded with the workshop content.
+
 ##### Scientists – Initial Setup
 Configure Azure Dev Ops Integrations
  Azure Databricks, set your Git provider to Azure DevOps Services on the User Settings page:
