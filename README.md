@@ -1,7 +1,5 @@
 # Data Bricks HOL  - Python & Dev Ops
-## TODOs
-1.  Discuss steps regarding zipping this repo and putting into the participant's ADO
-2.  
+
 ## Hands on Lab – Abstract
 This hands on lab is designed for the scenario where a team of scientists and engineers are responsible for the development, maintenance and quality of analytical models which are made available to other teams for consumption.
 ## Infrastructure Set Up
@@ -359,15 +357,24 @@ Configure Azure Dev Ops Integrations
 ![alt text](./readme_images/adb_create_notebook.png)
 
 4.	Link “train_model.py” file to your Azure Dev Ops repository.
-a.	Copy the git link from your azure dev ops portal:
+    
+    a.	Copy the git link from your azure dev ops portal:
+
+    b.  The format of the link will be: https://dev.azure.com/{yourOrg}/{yourproject}/_git/{yourRepository}
 
 ![alt text](./readme_images/copy_ado_git_link.png)
 
 b.	Paste into the “link” location in the popup for “Git Preferences”
+
 c.	Create a new branch.  Name it your unique user ID
+
 d.	Use “Project_One/notebooks/train_model.py” as the path in git repo.
 
 ![alt text](./readme_images/adb_git_link_settings_form.png)
+
+5.  Notice that the latest version appears to have imported everything and then deleted it.  Revert back to the previous commit.  Click on the previous commit and then "Restore this revision".
+
+![alt text](./readme_images/restore_original_commit.png)
 
 # Dev Loop Experience
 The dev loop experience encompasses mounting the dev data, exploring that data, training a model; writing the inference code, compiling a dev container; running tests inside the dev container.
