@@ -14,10 +14,12 @@ def transform_input(input_package):
     input_package: raw json input package as agreed upon
     returns: numpy array of correct format without pre-processing
     """
+    print ("loading json")
     d = json.loads(input_package)
+    print(d)
     # Add extra processing for some reason.
     x = np.array([d["age"], d["hours-per-week"]]).transpose()
-    return x
+    return x.reshape(-1,2)
 
 def transform_output(y):
     """
